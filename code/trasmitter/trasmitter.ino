@@ -17,14 +17,29 @@ void setup() {
   // put your setup code here, to run once:
 Serial.begin(9600);
 radio.begin();
+//new part
+  if (!radio.begin()) {
+    Serial.println(F("radio hardware is not responding!!"));
+    while (1) {} // hold in infinite loop
+  }
+////new part
+ radio.setChannel(2);
+  radio.setPayloadSize(4);
+  radio.setAutoAck(false);
+  radio.setCRCLength(RF24_CRC_8);
+  radio.printDetails();
+////end part
 radio.openWritingPipe(address);
 radio.stopListening();
 Serial.println ("Initializing MPU and testing connections");
 mpu.initialize ( );
 Serial.println((mpu.testConnection( )) ? "Successfully Connected" : "Connection failed");
+
 }
 
 void loop() {
+  Serial.println((mpu.testConnection( )) ? "Successfully Connected" : "Connection failed");
+
   // put your main code here, to run repeatedly:
   int data ;
   /*stop =1
@@ -42,14 +57,14 @@ if (ax>50){
   Serial.println("right");
   data=2;
   radio.write(&data,sizeof(data));
-   delay(1000);
+   //delay(1000);
  
 }
 if (ax<-50){
   Serial.println("left");
    data=3;
   radio.write(&data,sizeof(data));
-    delay(1000);
+   // delay(1000);
 
   
 }
@@ -57,7 +72,7 @@ if (ax<50&&ax>-50&&ay<50&&ay>-50){
   Serial.println("stop");
    data=1;
   radio.write(&data,sizeof(data));
-    delay(1000);
+   // delay(1000);
 
   
 }
@@ -65,7 +80,7 @@ if (ay>50){
   Serial.println("front");  
    data=5;
   radio.write(&data,sizeof(data));
-  delay(1000);
+  //delay(1000);
 
   
 }
@@ -73,10 +88,15 @@ if (ay<-50){
   Serial.println("back"); 
   data=4;
   radio.write(&data,sizeof(data));
-  delay(1000);
+  //delay(1000);
 
   
 }
-
+if (!radio.write(&data,sizeof(data))){
+    Serial.println("not sent"); 
+}
+else {
+   Serial.println(" sent"); 
+}
 
 }
