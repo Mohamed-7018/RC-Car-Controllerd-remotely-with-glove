@@ -20,11 +20,22 @@ void setup() {
   radio.begin();
   Serial.begin(9600);
   radio.openReadingPipe(0, address);
+ //new part
+  if (!radio.begin()) {
+    Serial.println(F("radio hardware is not responding!!"));
+    while (1) {} // hold in infinite loop
+  }
+////new part
+ radio.setChannel(2);
+  radio.setPayloadSize(4);
+  radio.setAutoAck(false);
+  radio.setCRCLength(RF24_CRC_8);
+  radio.printDetails();
+////end part
   radio.startListening();
   pinMode(mr_1, OUTPUT);
   pinMode(mr_2, OUTPUT);
-  pinMode(ml_1, OUTPUT); 
-  pinMode(ml_2, OUTPUT);
+  pinMode(ml_1, OUTPUT);  pinMode(ml_2, OUTPUT);
 
 }
 
@@ -37,6 +48,8 @@ void loop() {
     back=4
     front=5
   */
+ Serial.println((radio.available())?"done":"faild");
+ 
   if (radio.available()) {
     int redata;
     radio.read(&redata, sizeof(redata));
@@ -52,26 +65,28 @@ void loop() {
     if (redata == 2) {
         Serial.println("right");
 
-      movemo(1, 0, 0, 0);
+      movemo(0, 1, 0, 0);
       //delay (1000);
 
     } if (redata == 3) {
         Serial.println("left");
 
-      movemo(0, 0, 1, 0);
-      //delay (1000);
+      movemo(0, 0, 0, 1);
+     // delay (1000);
 
     } if (redata == 4) {
         Serial.println("back"); 
 
-      movemo(0, 1, 0, 1);
+      movemo(1, 0, 1, 0);
+ 
       //delay (1000);
 
     } if (redata == 5) {
         Serial.println("front");  
 
-      movemo(1, 0, 1, 0);
-      //delay (1000);
+      movemo(0, 1, 0, 1);
+    
+     // delay (1000);
 
     }
 
